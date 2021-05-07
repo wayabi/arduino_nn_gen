@@ -48,7 +48,7 @@ class nn_weight:
 			ss += "};\n"
 
 		for i in range(0, self.num_layers_-1):
-			ss += "float weight{}[][{}] = ".format(i, self.layer_num_[self.num_layers_-1]) + "{ "
+			ss += "float weight{}[][{}] = ".format(i, self.layer_num_[i+1]) + "{ "
 			for j in range(0, self.layer_num_[i]):
 				ss += "{"
 				for k in range(0, self.layer_num_[i+1]):
@@ -56,6 +56,10 @@ class nn_weight:
 				ss += "},"
 			ss += "};\n"
 		ss += "\n"
+		#ss += "float relu(float v){\n"
+		#ss += t + "return v > 0?v:0;\n"
+		#ss += "}\n\n"
+
 		ss += "byte nn(float n0[]){\n"
 		for i in range(0, self.num_layers_-1):
 			num = self.layer_num_[i+1]
@@ -69,12 +73,13 @@ class nn_weight:
 				for k in range(0, self.layer_num_[i]):
 					ss += t + "n{}".format(i+1) + "[{}]".format(j) + " += n{}[{}]".format(i, k) + " * weight{}[{}][{}];\n".format(i, k, j)
 				ss += t + "n{}[{}] += bias{}[{}];\n".format(i+1, j, i, j) 
+				#ss += t + "n{}[{}] = relu(n{}[{}]);".format(i+1, j, i+1, j)
 
 		ss += "\n"
 		ss += t + "float max_v = -999;\n"
 		ss += t + "byte max_idx = 0;\n"
 		ss += t + "for(byte i=0;i<{};++i)".format(self.layer_num_[self.num_layers_-1]) + "{\n"
-		ss += t+t+ "if(n{}[i] > max_idx)".format(self.num_layers_-1) + "{\n"
+		ss += t+t+ "if(n{}[i] > max_v)".format(self.num_layers_-1) + "{\n"
 		ss += t+t+t+ "max_idx = i;\n"
 		ss += t+t+t+ "max_v = n{}[i];\n".format(self.num_layers_-1)
 		ss += t+t+ "}\n"
